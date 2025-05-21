@@ -28,6 +28,7 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match.");
@@ -35,19 +36,20 @@ const SignupPage = () => {
     }
 
     try {
-      const { data } = await axios.post(
-        "http://localhost:3000/api/auth/signup",
-        {
-          name: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }
-      );
+      const res = await axios.post("http://localhost:3000/api/auth/signup", {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // const data = await res.json();
+
+      localStorage.setItem("token", res.data.token);
       alert("Account created successfully!");
-      navigate("/login");
+      navigate("/dashboard");
+
     } catch (err) {
-      console.log(err.response?.data?.message || "Signup failed");
+      console.log(err.response?.data?.message || "Signup failed. Please try again.");
     }
   };
 
@@ -59,6 +61,24 @@ const SignupPage = () => {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="fullName"
+              className="block text-sm font-medium mb-1"
+            >
+              Full name
+            </label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email address
@@ -122,42 +142,6 @@ const SignupPage = () => {
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          <div>
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium mb-1"
-            >
-              Full name
-            </label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium mb-1">
-              Select Role
-            </label>
-            <select
-              name="role"
-              id="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md"
-            >
-              <option value="admin">Admin</option>
-              <option value="readOnly">Read only</option>
-              <option value="s3Uploader">S3 Uploader</option>
-              <option value="ec2Manager">EC2 Manager</option>
-            </select>
           </div>
 
           <div className="flex items-start">

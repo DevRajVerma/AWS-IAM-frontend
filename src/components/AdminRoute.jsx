@@ -8,11 +8,16 @@ const AdminRoute = ({ children }) => {
 
   try {
     const decoded = jwtDecode(token);
-    if (decoded.role !== "admin") {
+    // console.log("Actual token:", token);
+    console.log("Decoded token:", decoded); // Add this for debugging
+
+    if (!decoded.role || decoded.role !== "admin") {
       return <Navigate to="/unauthorized" replace />;
     }
     return children;
   } catch (err) {
+    console.error("JWT decode error:", err);
+    localStorage.removeItem("token"); // Clear invalid token
     return <Navigate to="/login" replace />;
   }
 };

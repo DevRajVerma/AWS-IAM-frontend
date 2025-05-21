@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Cloud, Server, UploadCloud } from "lucide-react";
-import { Link  } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 const services = [
   {
@@ -27,6 +28,7 @@ const services = [
 
 const DashboardPage = () => {
   const [user, setUser] = useState(null);
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -36,15 +38,21 @@ const DashboardPage = () => {
     }
   }, []);
 
+  
   if (!user) return <div className="p-8 text-center">Loading...</div>;
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
-      <p className="mb-6 text-gray-600">
-        <strong>Email:</strong> {user.email} | <strong>Role:</strong>{" "}
-        {user.role}
-      </p>
+      {/* Greeting section */}
+      <div>
+        <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
+        <p className="mb-6 text-gray-600">
+          <strong>Email:</strong> {user.email} | <strong>Role:</strong>{" "}
+          {user.role}
+        </p>
+      </div>
+
+      {/* Services Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.map((service) => (
           <div
@@ -63,6 +71,8 @@ const DashboardPage = () => {
           </div>
         ))}
       </div>
+
+      
     </div>
   );
 };

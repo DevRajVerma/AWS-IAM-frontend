@@ -35,49 +35,8 @@ api.interceptors.request.use(
   }
 );
 
-// Mock data for initial users
-const initialUsers = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    email: "alice@example.com",
-    role: "readOnly",
-    status: "active",
-    lastLogin: "2023-05-15",
-  },
-  {
-    id: 2,
-    name: "Bob Smith",
-    email: "bob@example.com",
-    role: "s3Uploader",
-    status: "active",
-    lastLogin: "2023-05-10",
-  },
-  {
-    id: 3,
-    name: "Carol Williams",
-    email: "carol@example.com",
-    role: "ec2Manager",
-    status: "inactive",
-    lastLogin: "2023-04-22",
-  },
-  {
-    id: 4,
-    name: "Dave Brown",
-    email: "dave@example.com",
-    role: "admin",
-    status: "active",
-    lastLogin: "2023-05-16",
-  },
-  {
-    id: 5,
-    name: "Eve Davis",
-    email: "eve@example.com",
-    role: "readOnly",
-    status: "pending",
-    lastLogin: "Never",
-  },
-];
+// Initial empty state - data will be fetched from backend
+const initialUsers = [];
 
 const roles = [
   { value: "readOnly", label: "Read Only" },
@@ -161,16 +120,12 @@ function UserManagement() {
 
     try {
       const response = await api.get("/");
-      console.log(response.data);
-
+      console.log("Fetched users:", response.data);
       setUsers(response.data);
-
       setIsLoading(false);
-
-      // Simulating API call
     } catch (error) {
       console.error("Error fetching users:", error);
-      setError("Failed to fetch users. Please try again");
+      setError(error.response?.data?.message || "Failed to fetch users. Please try again");
       setIsLoading(false);
     }
   };
@@ -180,15 +135,14 @@ function UserManagement() {
     setError(null);
     try {
       const response = await api.post("/", userData);
+      console.log("User added:", response.data);
       setUsers([...users, response.data]);
       setIsLoading(false);
       setIsAddUserOpen(false);
       resetNewUser();
-
-      // Simulating API call
     } catch (error) {
       console.error("Error adding user:", error);
-      setError("Failed to add user. Please try again.");
+      setError(error.response?.data?.message || "Failed to add user. Please try again.");
       setIsLoading(false);
     }
   };
@@ -197,14 +151,10 @@ function UserManagement() {
     setIsLoading(true);
     setError(null);
     try {
-      console.log("Updating user with ID:", userId);
-      console.log("Update data:", userData);
-
       const id = userId || userData._id;
-
       const response = await api.put(`/${id}`, userData);
 
-      console.log("Update response:", response.data);
+      console.log("User updated:", response.data);
 
       setUsers(
         users.map((user) => {
@@ -229,16 +179,14 @@ function UserManagement() {
     setIsLoading(true);
     setError(null);
     try {
-      console.log("Attempting to delete user with ID:", userId);
-
       await api.delete(`/${userId}`);
+      console.log("User deleted:", userId);
 
-      //Update local state to remove the deleted user
+      // Update local state to remove the deleted user
       setUsers(
         users.filter((user) => {
           const currentId = user.id || user._id;
           return currentId !== userId;
-          // user.id !== userId;
         })
       );
       setIsLoading(false);
@@ -246,7 +194,7 @@ function UserManagement() {
       setUserToDelete(null);
     } catch (error) {
       console.error("Error deleting user:", error);
-      setError("Failed to delete user. Please try again.");
+      setError(error.response?.data?.message || "Failed to delete user. Please try again.");
       setIsLoading(false);
     }
   };
@@ -261,17 +209,15 @@ function UserManagement() {
   };
 
   const handleEditUser = (user) => {
-
     console.log("Editing user:", user);
     
-    //Making a copy to avoid direct state mutation
+    // Making a copy to avoid direct state mutation
     setCurrentUser({...user});
     setIsEditUserOpen(true);
   };
 
   const handleDeleteUser = (user) => {
-    console.log("Setting User to delete: ", user);
-
+    console.log("Deleting user:", user);
     setUserToDelete(user);
     setIsDeleteDialogOpen(true);
   };
@@ -284,7 +230,6 @@ function UserManagement() {
   const handleEditUserSubmit = (e) => {
     e.preventDefault();
     if (currentUser) {
-      // updateUser(currentUser.id, currentUser);
       const userId = currentUser.id || currentUser._id;
       updateUser(userId, currentUser);
     }
@@ -504,6 +449,20 @@ function UserManagement() {
             </button>
           </div>
         </div>
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+            <div className="flex justify-between items-center">
+              <span>{error}</span>
+              <button
+                onClick={() => setError(null)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="rounded-md border overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

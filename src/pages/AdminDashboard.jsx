@@ -47,7 +47,7 @@ function AdminDashboard() {
           }
         }
       } catch (error) {
-        console.error("Authentication error:", error)
+        
       } finally {
         setIsLoading(false)
       }

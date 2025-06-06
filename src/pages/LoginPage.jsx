@@ -4,12 +4,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
-
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -44,8 +43,8 @@ function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        //save jwttoken in local storage
-        localStorage.setItem("token", data.token);
+        //save jwttoken in local storage and update auth state
+        login(data.token);
         // alert("Login successful!");
         navigate("/dashboard");
 
@@ -54,7 +53,7 @@ function LoginPage() {
         alert(data.message || "Login failed");
       }
     } catch (err) {
-      console.log("Login Error: ", err);
+      
       alert("Something went wrong.");
     }
     // Redirect to dashboard

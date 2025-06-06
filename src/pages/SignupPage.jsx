@@ -49,7 +49,7 @@ const SignupPage = () => {
       navigate("/dashboard");
 
     } catch (err) {
-      console.log(err.response?.data?.message || "Signup failed. Please try again.");
+      
     }
   };
 
